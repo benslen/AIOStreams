@@ -106,6 +106,12 @@ export function mergeParsedFiles(
   let episodes = arrayFallback(fileParsed?.episodes, folderParsed?.episodes);
   let seasons = arrayFallback(fileParsed?.seasons, folderParsed?.seasons);
   const richest = richerParsedFile(fileParsed, folderParsed);
+  const probedSubtitles =
+    fileParsed?.subtitleInfoQuality === 'probe'
+      ? fileParsed
+      : folderParsed?.subtitleInfoQuality === 'probe'
+        ? folderParsed
+        : undefined;
 
   return {
     title: richest?.title || folderParsed?.title || fileParsed?.title,
@@ -141,9 +147,17 @@ export function mergeParsedFiles(
       fileParsed?.audioChannels
     ),
     languages: arrayMerge(folderParsed?.languages, fileParsed?.languages),
-    subtitles: arrayMerge(folderParsed?.subtitles, fileParsed?.subtitles),
+    subtitles: probedSubtitles
+      ? probedSubtitles.subtitles
+      : arrayMerge(folderParsed?.subtitles, fileParsed?.subtitles),
+    subtitleInfoQuality:
+      probedSubtitles?.subtitleInfoQuality ??
+      fileParsed?.subtitleInfoQuality ??
+      folderParsed?.subtitleInfoQuality,
     audioTracks: fileParsed?.audioTracks ?? folderParsed?.audioTracks,
-    subtitleTracks: fileParsed?.subtitleTracks ?? folderParsed?.subtitleTracks,
+    subtitleTracks: probedSubtitles
+      ? probedSubtitles.subtitleTracks
+      : (fileParsed?.subtitleTracks ?? folderParsed?.subtitleTracks),
     subbed: fileParsed?.subbed || folderParsed?.subbed || false,
     dubbed: fileParsed?.dubbed || folderParsed?.dubbed || false,
     seasonPack,

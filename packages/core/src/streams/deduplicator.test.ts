@@ -79,6 +79,31 @@ describe('deduplicate', () => {
 });
 
 describe('mergeLanguagesAndSubtitles', () => {
+  it('merges probed subtitles without treating filename audio languages as probed', () => {
+    const winner = makeStream(undefined, ['German'], ['English']);
+    winner.parsedFile!.subtitleInfoQuality = 'probe';
+    winner.parsedFile!.subtitles = ['French'];
+    winner.parsedFile!.subtitleTracks = [{ lang: 'French' }];
+    const indexer = makeStream('indexer', ['Japanese'], ['Spanish']);
+    merge(winner, [indexer]);
+    assert.deepEqual(winner.parsedFile!.languages, ['Japanese']);
+    assert.equal(winner.parsedFile!.mediaInfoQuality, 'indexer');
+    assert.deepEqual(winner.parsedFile!.subtitles, ['French']);
+    assert.deepEqual(winner.parsedFile!.subtitleTracks, [{ lang: 'French' }]);
+    assert.equal(winner.parsedFile!.subtitleInfoQuality, 'probe');
+  });
+
+  it('keeps a probed empty subtitle list when another duplicate has filename guesses', () => {
+    const winner = makeStream(undefined, ['German'], ['French']);
+    const probed = makeStream(undefined, ['German'], []);
+    probed.parsedFile!.subtitleInfoQuality = 'probe';
+    probed.parsedFile!.subtitleTracks = [];
+    merge(winner, [probed]);
+    assert.deepEqual(winner.parsedFile!.subtitles, []);
+    assert.deepEqual(winner.parsedFile!.subtitleTracks, []);
+    assert.equal(winner.parsedFile!.mediaInfoQuality, undefined);
+  });
+
   it('takes only the probe, discarding the indexer entirely', () => {
     const winner = makeStream(undefined, [], []);
     const indexerOther = makeStream('indexer', ['English'], ['English']);

@@ -805,6 +805,7 @@ export const UserDataSchema = z.object({
   includedSubtitles: z.array(Languages).optional(),
   requiredSubtitles: z.array(Languages).optional(),
   preferredSubtitles: z.array(Languages).optional(),
+  probeSubtitles: z.boolean().optional(),
   excludedVisualTags: z.array(VisualTags).optional(),
   includedVisualTags: z.array(VisualTags).optional(),
   requiredVisualTags: z.array(VisualTags).optional(),
@@ -1409,6 +1410,8 @@ export const ParsedFileSchema = z.object({
   mediaInfoQuality: z.enum(MEDIA_INFO_QUALITY_TIERS).optional(),
   languages: z.array(z.string()),
   subtitles: z.array(z.string()).optional(),
+  /** Provenance for subtitle-only probes; does not upgrade audio metadata. */
+  subtitleInfoQuality: z.enum(MEDIA_INFO_QUALITY_TIERS).optional(),
   audioTracks: z.array(MediaTrackSchema).optional(),
   subtitleTracks: z.array(MediaTrackSchema).optional(),
   subbed: z.boolean().optional(),

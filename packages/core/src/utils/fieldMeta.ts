@@ -108,6 +108,7 @@ export const FIELD_META: Omit<Record<keyof UserData, FieldMeta>, IgnoredKeys> = 
   includedSubtitles: { label: 'Included Subtitles', group: 'filters', type: 'list', menu: 'filters', subTab: 'subtitle', keywords: ['subs'] },
   requiredSubtitles: { label: 'Required Subtitles', group: 'filters', type: 'list', menu: 'filters', subTab: 'subtitle', keywords: ['subs'] },
   preferredSubtitles: { label: 'Preferred Subtitles', group: 'filters', type: 'list', menu: 'filters', subTab: 'subtitle', keywords: ['subs'] },
+  probeSubtitles: { label: 'Inspect Subtitle Tracks', group: 'filters', type: 'scalar', menu: 'filters', subTab: 'subtitle', keywords: ['subs', 'probe'] },
 
   excludedVisualTags: { label: 'Excluded Visual Tags', group: 'filters', type: 'list', menu: 'filters', subTab: 'visual-tag', keywords: ['hdr', 'dolby vision', 'dv'] },
   includedVisualTags: { label: 'Included Visual Tags', group: 'filters', type: 'list', menu: 'filters', subTab: 'visual-tag', keywords: ['hdr', 'dolby vision', 'dv'] },
