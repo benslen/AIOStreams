@@ -18,6 +18,8 @@ import StreamUtils, {
   isServiceWrapEligibleP2PStream,
 } from './utils.js';
 import { applyReleaseBlocklist } from '../release-blocklist/filter.js';
+import { subtitleProbe } from '../subtitle-probe/index.js';
+import { subtitleLanguages } from '../utils/media-info.js';
 import {
   normaliseTitle,
   preprocessTitle,
@@ -395,6 +397,7 @@ class StreamFilterer {
 
     const start = Date.now();
     // Sub-phase timing accumulators for this filter() call
+    await subtitleProbe.resolve(streams, this.userData, context);
     let metadataMs = 0;
     let expressionMs = 0;
     let regexCompileMs = 0;
@@ -1556,6 +1559,10 @@ class StreamFilterer {
       const skipSubtitleFiltering =
         shouldPassthroughStage(stream, 'subtitle') ||
         isPendingServiceWrapResolution;
+      const subtitles = subtitleLanguages(file);
+      const subtitleDescription = subtitles.length
+        ? subtitles.join(', ')
+        : 'None';
 
       if (originalLanguage && LANGUAGES.includes(originalLanguage as any)) {
         if (
@@ -1701,15 +1708,11 @@ class StreamFilterer {
       if (
         !skipSubtitleFiltering &&
         this.userData.includedSubtitles?.some((lang) =>
-          (file?.subtitles?.length ? file.subtitles : ['Unknown']).includes(
-            lang
-          )
+          subtitles.includes(lang)
         )
       ) {
         const lang = this.userData.includedSubtitles.find((lang) =>
-          (file?.subtitles?.length ? file.subtitles : ['Unknown']).includes(
-            lang
-          )
+          subtitles.includes(lang)
         );
         this.incrementIncludedReason('subtitle', lang!);
         return true;
@@ -2055,14 +2058,12 @@ class StreamFilterer {
       if (
         !skipSubtitleFiltering &&
         this.userData.excludedSubtitles?.length &&
-        (file?.subtitles?.length ? file.subtitles : ['Unknown']).every((sub) =>
+        subtitles.length > 0 &&
+        subtitles.every((sub) =>
           this.userData.excludedSubtitles!.includes(sub as any)
         )
       ) {
-        this.incrementRemovalReason(
-          'excludedSubtitle',
-          file?.subtitles?.length ? file.subtitles.join(', ') : 'Unknown'
-        );
+        this.incrementRemovalReason('excludedSubtitle', subtitleDescription);
         return false;
       }
 
@@ -2070,14 +2071,9 @@ class StreamFilterer {
         !skipSubtitleFiltering &&
         this.userData.requiredSubtitles &&
         this.userData.requiredSubtitles.length > 0 &&
-        !this.userData.requiredSubtitles.some((sub) =>
-          (file?.subtitles?.length ? file.subtitles : ['Unknown']).includes(sub)
-        )
+        !this.userData.requiredSubtitles.some((sub) => subtitles.includes(sub))
       ) {
-        this.incrementRemovalReason(
-          'requiredSubtitle',
-          file?.subtitles?.length ? file.subtitles.join(', ') : 'Unknown'
-        );
+        this.incrementRemovalReason('requiredSubtitle', subtitleDescription);
         return false;
       }
 

@@ -14,7 +14,7 @@ import { createLogger } from '../logging/logger.js';
 import { ExpressionContext } from '../streams/context.js';
 import { formRegexFromKeywordsSync } from '../utils/regex.js';
 import { ObjectFilter, compileObjectFilter } from '../utils/object-filter.js';
-import { describedTracks } from '../utils/media-info.js';
+import { describedTracks, subtitleLanguages } from '../utils/media-info.js';
 
 const logger = createLogger('stream-expression');
 
@@ -852,10 +852,7 @@ export abstract class StreamExpressionEngine {
         subtitles
           .map((s) => s.toLowerCase())
           .some((s) =>
-            (stream.parsedFile?.subtitles?.length
-              ? stream.parsedFile.subtitles
-              : ['Unknown']
-            )
+            subtitleLanguages(stream.parsedFile)
               ?.map((sub) => sub.toLowerCase())
               .includes(s)
           )
@@ -1539,11 +1536,9 @@ export abstract class StreamExpressionEngine {
                 : ['Unknown']
             ).map((v) => v.toLowerCase());
           case 'subtitle':
-            return (
-              stream.parsedFile?.subtitles?.length
-                ? stream.parsedFile.subtitles
-                : ['Unknown']
-            ).map((v) => v.toLowerCase());
+            return subtitleLanguages(stream.parsedFile).map((v) =>
+              v.toLowerCase()
+            );
           default:
             throw new Error(
               `perGroup: unsupported attribute '${attribute}'. Supported: resolution, quality, encode, type, service, indexer, releaseGroup, visualTag, audioTag, audioChannel, language, subtitle`

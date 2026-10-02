@@ -1,6 +1,7 @@
 import { ParsedStream, SortCriterion, UserData } from '../db/schemas.js';
 import { createLogger, constants } from '../utils/index.js';
 import { StreamContext } from './index.js';
+import { subtitleLanguages } from '../utils/media-info.js';
 
 const logger = createLogger('sorter');
 
@@ -296,9 +297,7 @@ class StreamSorter {
           if (minSubtitleIndex === undefined) {
             return 0;
           }
-          const effectiveSubtitles = stream.parsedFile?.subtitles?.length
-            ? stream.parsedFile.subtitles
-            : ['Unknown'];
+          const effectiveSubtitles = subtitleLanguages(stream.parsedFile);
           for (const subtitle of effectiveSubtitles) {
             const idx = userData.preferredSubtitles?.indexOf(subtitle as any);
             if (idx !== undefined && idx !== -1 && idx < minSubtitleIndex) {

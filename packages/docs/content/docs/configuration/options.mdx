@@ -107,6 +107,24 @@ The next couple sections allow you to filter streams based on generic attributes
 - `Audio Tag` - The audio tag of the stream, such as Dolby Atmos, DTS, etc.
 - `Audio Channel` - The audio channel of the stream, such as 5.1, 7.1, etc.
 - `Language` - The language of the stream, such as English, Spanish, etc.
+- `Subtitle` - The languages of subtitles available for the stream.
+
+**Inspect Subtitle Tracks** is enabled by default in the Subtitle tab. When subtitle filters or
+preferences are set, AIOStreams checks embedded tracks in playable MKV/WebM and MP4 files before
+filtering. This works even when their filenames do not mention subtitles. It does not search for
+separate subtitle downloads, resolve raw P2P torrents, or start uncached debrid downloads.
+
+The check uses HTTP byte ranges to read container metadata, including seeking past an MP4's video
+data when its track information is at the end. It never falls back to downloading the whole file.
+Each file is limited to 256 KiB and 16 requests; each filtering batch has a three-second deadline.
+Up to four probes run in parallel, with at most 32 new file probes per stream request. Successful
+results are cached for 24 hours and unsuccessful checks for five minutes. Files with existing
+probed media information do not need another check.
+
+If a file is inaccessible, unsupported, too slow, or does not support byte ranges, its existing
+metadata is retained. A complete probe with no subtitle tracks means the file has no embedded
+subtitles; a track with no usable language is labelled Unknown. Turn the setting off to keep
+using only the metadata supplied by addons and filename parsing.
 
 Each of these sections above have very similar options:
 

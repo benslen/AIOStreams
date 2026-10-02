@@ -1045,6 +1045,22 @@ function Content() {
             <>
               <HeadingWithPageControls heading="Subtitle" />
 
+              <SettingsCard
+                id="probeSubtitles"
+                title="Inspect Subtitle Tracks"
+                description="Check embedded subtitle languages in playable MKV, WebM and MP4 files when subtitle filters or preferences are set. Reads small parts of the file and caches the result. Slow, inaccessible or unsupported files keep their existing metadata."
+              >
+                <Switch
+                  label="Enable"
+                  side="right"
+                  value={userData.probeSubtitles ?? true}
+                  defaultValue={true}
+                  onValueChange={(value) =>
+                    setUserData((prev) => ({ ...prev, probeSubtitles: value }))
+                  }
+                />
+              </SettingsCard>
+
               <Alert
                 intent="warning"
                 title="Difference between Language and Subtitle filters"
@@ -1115,6 +1131,11 @@ function Content() {
                     containing &quot;Eng.Sub&quot; will add English to
                     languages, not subtitles). This is a known limitation of
                     filename-only parsing.
+                    <br />
+                    <br />
+                    Inspect Subtitle Tracks verifies embedded subtitle languages
+                    when it succeeds. Audio language detection remains
+                    unchanged.
                   </div>
                 }
               />

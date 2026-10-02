@@ -634,9 +634,14 @@ class StreamDeduplicator {
         }
       }
       if (fields.includes('subtitles')) {
-        if (probed) {
-          winner.parsedFile.subtitles = probed.subtitles;
-          winner.parsedFile.subtitleTracks = probed.subtitleTracks;
+        const subtitleProbe = sources.find(
+          (s) => s.parsedFile?.subtitleInfoQuality === 'probe'
+        )?.parsedFile;
+        const subtitleSource = subtitleProbe ?? probed;
+        if (subtitleSource) {
+          winner.parsedFile.subtitles = subtitleSource.subtitles;
+          winner.parsedFile.subtitleTracks = subtitleSource.subtitleTracks;
+          winner.parsedFile.subtitleInfoQuality = 'probe';
         } else {
           winner.parsedFile.subtitles = arrayMerge(
             [],

@@ -16,6 +16,15 @@ export interface ParsedMediaTrack {
   visualImpaired?: boolean;
 }
 
+/** A completed subtitle probe with no tracks means none, rather than unknown. */
+export function subtitleLanguages(file?: {
+  subtitles?: string[];
+  subtitleInfoQuality?: string;
+}): string[] {
+  if (file?.subtitleInfoQuality === 'probe') return file.subtitles ?? [];
+  return file?.subtitles?.length ? file.subtitles : ['Unknown'];
+}
+
 export interface ParsedMediaInfo {
   /** Provenance tier; unset means unconfirmed. */
   mediaInfoQuality?: 'probe' | 'indexer' | 'addon';
